@@ -1,0 +1,63 @@
+<!-- dashboard/question1.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QR Challenge - Question 1</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>QR Challenge - Question 1</h2>
+
+    <form id="teamAuthForm">
+      <input type="text" id="teamCode" placeholder="Enter your team code" required />
+      <button type="submit">Start</button>
+    </form>
+
+    <div id="questionBox" style="display: none;">
+      <p><strong>Question:</strong> What is 10 + 5?</p>
+      <input type="text" id="answer" placeholder="Enter your answer" />
+      <button onclick="submitAnswer()">Submit Answer</button>
+    </div>
+  </div>
+
+  <script>
+    const IPV4 = "http://172.16.45.140:3000/"
+    let currentTeamCode = null;
+
+    document.getElementById("teamAuthForm").onsubmit = function (e) {
+      e.preventDefault();
+      const code = document.getElementById("teamCode").value.trim();
+      if (!code) return alert("Enter a valid team code.");
+      currentTeamCode = code;
+      document.getElementById("teamAuthForm").style.display = "none";
+      document.getElementById("questionBox").style.display = "block";
+    };
+
+    function submitAnswer() {
+      const answer = document.getElementById("answer").value.trim();
+      if (answer === "15") {
+        fetch(IPV4 +"update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamCode: currentTeamCode,
+            points: 10,
+            letter: "R"
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert("Correct! 10 points awarded. Redirecting to dashboard...");
+          localStorage.setItem("teamCode", currentTeamCode);
+          window.location.href = "index.html";
+        })
+        .catch(() => alert("Failed to update score. Please try again."));
+      } else {
+        alert("Wrong answer. Try again.");
+      }
+    }
+  </script>
+</body>
+</html>
